@@ -8,7 +8,7 @@ Created on Thu Jan 21 13:14:23 2021
 from PIL import Image
 from time import sleep
 import click
-
+from typing import List, Optional
 
 # Les dictionnaires qui servent à traduire les mots en carte
 # (Carte.tarduction())
@@ -18,6 +18,26 @@ dicoF = {'10': 100, '20': 200, '25': 25, '50': 50, '75': 75,
          'fe': "'feu'", 'pn': "'pneu'", 'vi': "'vitesse'"}
 
 dicoC = {'A': 'Attaque', 'B': 'Botte', 'D': 'Distance', 'P': 'Parade'}
+
+err = '\x1B[31m'
+coup_fourre = '\x1B[32m'
+
+
+# %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
+
+def saisir(menu: List[str], msg_err: Optional[str] = None) -> str:
+    '''Invite de saisie d'un choix parmi une liste de caractères.'''
+
+    c = click.getchar()
+    while c not in menu:
+        if msg_err is not None:
+            print(err, msg_err, sep='', end='\x1B[m\r')
+
+        c = click.getchar()
+
+    print('\x1B[2K')
+    return c
+
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
 
