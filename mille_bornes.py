@@ -6,8 +6,8 @@ Created on Thu Jan 10 15:04:26 2021
 """
 from random import shuffle
 
-from iadh import Joueur
-from parsa import *
+from joueur import Joueur
+from carte import *
 
 class MilleBornes:
 

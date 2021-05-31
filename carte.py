@@ -48,6 +48,9 @@ class Carte(ABC):
         cla, fam = self.__class__.__name__[0], self._famille[:2]
         return cla+fam
 
+    def initiales(self):
+        return self.__class__.__name__[0], self._famille[0].upper()
+
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
 

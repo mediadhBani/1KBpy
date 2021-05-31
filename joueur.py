@@ -1,14 +1,15 @@
 # -*- coding: utf-8 -*-
 
-from parsa import *
+from carte import *
+import auxiliaire as aux
 from auxiliaire import beauMot, animation
 from auxiliaire import choix as chx 
 
 class Joueur:
     # ces attributs n'apparaissent pas dans le diagramme de classe car peu
     # pértinent.
-    __MENU1 = {str(i) for i in range(9)}
-    __MENU2 = {str(i) for i in range(7)}
+    __MENU1 = '012345678'
+    __MENU2 = '0123456'
     __VIDE = '   '
 
     def __init__(self, nom):
@@ -28,10 +29,23 @@ class Joueur:
 
     def __str__(self):
         # mise en forme du contenu de la table
-        p = ', '.join(beauMot(c.abreviation()) for c in self.__table[:2])
-        b = ' '.join(c.abreviation() for c in self.__table[2:]) or self.__VIDE
+        cla, fam = self.__table[0].initiales()
+        bataille = f"{aux.clr[cla]}{fam}{aux.reg}"
 
-        return f"{self.nom:4} - {self.score:3} km [ {p:8} | {b} | {self.__n200}*200 ]"
+        cla, _ = self.__table[1].initiales()
+        vitesse = f"{aux.clr[cla]}L{aux.reg}"
+
+        bottes_inp = map(lambda x: x.initiales()[1], self.__table[2:])
+        bottes_out = []
+        for c in 'AEFP':
+            if c in bottes_inp:
+                bottes_out.append(f"{aux.clr['B']}{c}{aux.reg}")
+            else:
+                bottes_out.append(c)
+
+        bottes = ' '.join(bottes_out)
+
+        return f"{self.nom:8} - {self.score:03} km [ {bataille} {vitesse} | {bottes} | {self.__n200}*200 ]"
 
 # ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||| #
 
@@ -87,7 +101,7 @@ class Joueur:
         # À ce moment du jeu, le joueur n'a plus à avoir de priorité.
         self.__priorite = False
 
-        print("\n" + f"Au tour de {self} :")
+        print(f"\nAu tour de {self} :")
 
         # Liste la main
         animation(self)
@@ -95,15 +109,11 @@ class Joueur:
             print(f"{i}: {carte}")
         print("-"*42)
 
-        print('7:Défausser    8:Sauver et quitter')
+        print(f"7:{aux.dfs}Défausse{aux.reg}    8:Sauver et quitter")
 
-        choix = input("Que faire [0-8] ? ")
+        print("Que faire [0-8] ? ", end='')
+        choix = int(aux.choisir_action('012345678'))
 
-        while choix not in self.__MENU1:
-            choix = input("Saisie invalide. Que faire [0-8] ? ")
-
-        # Une redondance mais qui facilite d'autres parties du programme.
-        choix = int(choix)
         self.__choix = choix
 
         return choix

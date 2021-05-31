@@ -8,7 +8,7 @@ Created on Thu Jan 21 13:14:23 2021
 from PIL import Image
 from time import sleep
 import click
-from typing import List, Optional
+# from typing import List, Optional
 
 # Les dictionnaires qui servent à traduire les mots en carte
 # (Carte.tarduction())
@@ -19,24 +19,22 @@ dicoF = {'10': 100, '20': 200, '25': 25, '50': 50, '75': 75,
 
 dicoC = {'A': 'Attaque', 'B': 'Botte', 'D': 'Distance', 'P': 'Parade'}
 
+dfs = '\x1B[41m'
 err = '\x1B[31m'
-coup_fourre = '\x1B[32m'
+reg = '\x1B[m'
+cfr = '\x1B[32m'
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
 
-def saisir(menu: List[str], msg_err: Optional[str] = None) -> str:
+def choisir_action(menu: str) -> str:
     '''Invite de saisie d'un choix parmi une liste de caractères.'''
 
-    c = click.getchar()
-    while c not in menu:
-        if msg_err is not None:
-            print(err, msg_err, sep='', end='\x1B[m\r')
-
+    while True:
         c = click.getchar()
-
-    print('\x1B[2K')
-    return c
+        if c in menu:
+            print(c)
+            return c
 
 
 # %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% #
@@ -50,6 +48,9 @@ dico = {'A': {'ac': 'Accident', 'es': 'Panne d\'essence', 'fe': 'Feu rouge',
               '10': 'Lièvre', '20': 'Hirondelle'},
         'P': {'ac': 'Réparations', 'es': 'Essence', 'fe': 'Feu vert',
               'pn': 'Roue de secours', 'vi': 'no limit'}}
+
+clr = {'A': '\x1B[41m', 'B': '\x1B[44m', 'P': '\x1B[42m'}
+abr = {'ac': 'A', 'es': 'E', 'fe': 'F', 'pn': 'P', 'vi': 'L'}
 
 def beauMot(mot):
     c, f1, f2 = mot

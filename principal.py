@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 
-import auxiliaire
-from auxiliaire import choix
-from MilleBornes import MilleBornes
+import auxiliaire as aux
+from mille_bornes import MilleBornes
 import click
 
 print("+---------------------------------------------------+")
@@ -14,29 +13,20 @@ print("Pythonisation de P. Farsi & M.-I. Bani & M. Ben Ftima")
 
 # %% Chargement de partie
 
-print("\nReprendre la dernière partie [[O]ui, [N]on] ?", end=' ', flush=True)
-chrgmt = choix({'n', 'o', 'N', 'O'})
+print("\nReprendre la dernière partie [[O]ui, [N]on] ? ", end=' ')
+chrgmt = aux.choisir_action('OoNn')
 
-
-if chrgmt in {'o', 'O'}:
+if chrgmt in 'Oo':
     partie = MilleBornes.chargement()
 
 # %% Nouvelle partie
 else:
     print("\vCombien de joueurs [2-6] ? ", end='', flush=True)
-    nJoueurs = choix({str(n) for n in range(2, 7)})
-
-    nJoueurs = int(nJoueurs)
+    nJoueurs = int(aux.choisir_action('23456'))
 
     nomsJoueurs = []
     for i in range(nJoueurs):
-        nom = input(f"Joueur {i} : ")
-
-        # pas de doublon
-        while nom in nomsJoueurs:
-            nom = input(f"\033[33mIl y a un doublon.\033[m Joueur {i} : ")
-
-        nomsJoueurs.append(nom)
+        nomsJoueurs.append(input(f"Joueur {i} : ")[:8])
 
     partie = MilleBornes.nouveau(nomsJoueurs)
 # partie = MilleBornes.nouveau(['a', 'b']) # pour débuguer
