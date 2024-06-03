@@ -96,6 +96,9 @@ class Player:
     safeties: State = State(0)
     hand: list[Card[int | State]] = field(default_factory=list)
 
+    def is_slow(self) -> bool:
+        return State.SPEED_LIMIT in self.hazards
+
 
 
 def validate_input(prompt: str, upperbound: int) -> int:
@@ -125,8 +128,8 @@ if __name__ == "__main__":
 
     shuffle(deck)
 
-    players = [Player(hazards=State.RED_LIGHT) for _ in range(2)]
-    nbPlayers = len(players)
+    number_players: int = 2
+    players = [Player(hazards=State.RED_LIGHT) for _ in range(number_players)]
 
     for i, p in enumerate(players):
         p.hand = [deck.pop() for _ in range(6)]
@@ -137,7 +140,7 @@ if __name__ == "__main__":
     turns = 0
 
     while True:
-        card, player = deck.pop(), players[turns % nbPlayers]
+        card, player = deck.pop(), players[turns % number_players]
         remaining_distances -= type(card) is Distance
 
         # montrer main en jeu
@@ -160,20 +163,28 @@ if __name__ == "__main__":
         match (card := player.hand[card_idx]):
             case Distance():
                 if (not player.hazards or player.hazards is State.SPEED_LIMIT and card.value <= Distance.SPEED_LIMIT) \
-                and player.score + card.value <= DISTANCE_WIN:
+                and player.score + card.value <= DISTANCE_WIN \
+                and player.count200 < 2:
                     player.score += card.value
+                    player.count200 += (card.value == 200)
                 else:
                     print("Vous ne pouvez pas jouer cette carte.")
                     continue
 
             case Hazard():
-                target = players[validate_input("Quel joueur attaquer ?", len(players))]
-                if player is not target \
-                and card.value not in target.hazards \
-                and card.value not in target.safeties:
-                    ...
+                target_idx = validate_input("Quel joueur attaquer ?", len(players))
+
+                if not (target := players[target_idx]) is player \
+                and not (target.is_slow() and card.value is State.SPEED_LIMIT) \
+                and (target.hazards | target.safeties) & ~State.SPEED_LIMIT is State(0):
+                    # attaque validée, mais il faut dorénavant prendre en compte un éventuel coup-fourré
+                    if any(card.value in c.value for c in target.hand if type(c) is Safety):
+                        print("coup fourré !")
+                        turn = target_idx-1
+                    else:
+                        target.hazards |= card.value
                 else:
-                    print("Vous ne pouvez pas attaquer ce joueur.")
+                    print("Vous ne pouvez pas attaquer dans ces conditions.")
                     continue
 
             case Remedy():
