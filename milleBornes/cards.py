@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from random import shuffle
 from dataclasses import dataclass
 from enum import IntFlag, auto, IntEnum
 from typing import Any, Self
@@ -112,3 +113,26 @@ class Safety(Card):
         if self.value is State.RED_LIGHT | State.SPEED_LIMIT:
             return "Véhicule prioritaire"
 
+
+class CardShoe:
+    def __init__(self):
+        content: list[Card] = []
+        for card_class in (Distance, Hazard, Remedy, Safety):
+            content.extend(card_class.generate_all())
+
+        self.__remaining_distances = sum(Distance.get_content().values())
+
+        shuffle(content)
+        self.__content = content
+
+    def has_distances(self) -> bool:
+        return self.__remaining_distances != 0
+
+    def pop(self):
+        if not self.has_distances():
+            return Distance(0)
+        
+        card = self.__content.pop()
+        self.__remaining_distances -= type(card) is Distance
+
+        return card

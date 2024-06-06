@@ -3,13 +3,8 @@
 from milleBornes.players import *
 
 if __name__ == "__main__":
-    from random import shuffle
-
     # instanciation de la pioche
-    deck: list[Card] = []
-    for card_class in [Distance, Hazard, Remedy, Safety]:
-        deck.extend(card_class.generate_all())
-    shuffle(deck)
+    deck = CardShoe()
 
     # instanciation des joueurs
     number_players: int = 2
@@ -18,7 +13,6 @@ if __name__ == "__main__":
         player.hand = [deck.pop() for _ in range(6)]
 
     # compteurs et drapeau
-    remaining_distances: int = sum(type(card) is Distance for card in deck)
     turns: int = 0
     turn_end = True
     player = players[0]
@@ -35,7 +29,6 @@ if __name__ == "__main__":
             player = players[turns % number_players]
             card = deck.pop()
             player.hand.append(card)
-            remaining_distances -= type(card) is Distance
             turn_end = False
 
         # montrer l'interface du jeu
@@ -100,7 +93,6 @@ if __name__ == "__main__":
                             target.hand.pop(i)
                             target.safeties |= c.value
                             card = deck.pop()
-                            remaining_distances -= (type(c) is Distance)
                             target.hand.append(card)
                             turns = players.index(target) - 1
                             break
@@ -117,7 +109,7 @@ if __name__ == "__main__":
             print(f"Le joueur J{players.index(player)} a gagné !")
             break
 
-        if remaining_distances == 0:
+        if not deck.has_distances():
             winner = max(players, key=lambda p: p.score)
             print(f"Le joueur J{players.index(winner)} a le score le plus élevé avec {winner.score} bornes !")
             break
