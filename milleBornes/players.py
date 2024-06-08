@@ -3,6 +3,7 @@ from dataclasses import dataclass, field
 
 @dataclass
 class Player:
+    name: str
     score: int = 0
     count200: int = 0
     hazards: State = State(0)

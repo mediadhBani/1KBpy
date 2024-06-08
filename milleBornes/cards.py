@@ -5,9 +5,10 @@ from enum import IntFlag, auto, IntEnum
 from typing import Any, Self
 
 class Rule(IntEnum):
-    WINNING_DISTANCE: int = 1000
-    SPEED_LIMIT = 50
+    FIRST_DEAL = 6
     MAX_USE_200 = 2
+    SPEED_LIMIT = 50
+    WINNING_DISTANCE = 1000
 
 class State(IntFlag):
     RED_LIGHT = auto()
@@ -125,10 +126,15 @@ class CardShoe:
         shuffle(content)
         self.__content = content
 
+    def deal(self) -> list[Card]:
+        hand = [self.__content.pop() for _ in range(Rule.FIRST_DEAL)]
+        self.__remaining_distances -= sum(card is Distance for card in hand)
+        return hand
+
     def has_distances(self) -> bool:
         return self.__remaining_distances != 0
 
-    def pop(self):
+    def draw(self) -> Card:
         if not self.has_distances():
             return Distance(0)
         
