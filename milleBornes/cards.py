@@ -18,7 +18,7 @@ class State(IntFlag):
     ACCIDENT = auto()
 
 @dataclass(frozen=True, slots=True)
-class Card(ABC):
+class BaseCard(ABC):
     value: Any
     
     @classmethod
@@ -32,7 +32,7 @@ class Card(ABC):
         cards: list[Self] = []
         return sum((v * [cls(k)] for k, v in cls.get_content().items()), cards)
 
-class Distance(Card):
+class Distance(BaseCard):
     @classmethod
     def get_content(cls) -> dict[int, int]:
         return {
@@ -46,7 +46,7 @@ class Distance(Card):
     def __str__(self) -> str:
         return f"{self.value} bornes"
         
-class Hazard(Card):
+class Hazard(BaseCard):
     value: State
 
     @classmethod
@@ -69,7 +69,7 @@ class Hazard(Card):
 
         raise ValueError(f"Carte Corrompue ! Valeur reçue : {self.value!r}")
     
-class Remedy(Card):
+class Remedy(BaseCard):
     value: State
 
     @classmethod
@@ -92,7 +92,7 @@ class Remedy(Card):
 
         raise ValueError(f"Carte Corrompue ! Valeur reçue : {self.value!r}")
 
-class Safety(Card):
+class Safety(BaseCard):
     value: State
 
     @classmethod
@@ -114,6 +114,7 @@ class Safety(Card):
         if self.value is State.RED_LIGHT | State.SPEED_LIMIT:
             return "Véhicule prioritaire"
 
+Card = Distance | Hazard | Remedy | Safety
 
 class CardShoe:
     def __init__(self):

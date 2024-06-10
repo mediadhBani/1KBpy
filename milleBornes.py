@@ -78,8 +78,6 @@ if __name__ == "__main__":
                         break
                 else:
                     target.hazards |= card.value
-            case _:
-                raise NotImplemented
 
         # la carte jouée est défaussée
         player.hand.pop(card_idx)
