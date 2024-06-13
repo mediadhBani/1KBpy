@@ -108,9 +108,9 @@ class CLI(UI):
         return int(ans)
 
     def display_ranking(self, players: list[Player]):
-        players = sorted(players, key=lambda p: p.score)
-        print(f"Le gagnant est {players[-1].name}")
-        for rank, player in enumerate(sorted(players, key=lambda p: p.score, reverse=True)):
-            print(f"#{rank+1} J{players.index(player)} {player.score: >4}")
+        players = sorted(players, key=lambda p: p.score, reverse=True)
+        print(f"Le gagnant est {players[0].name}.")
+        for rank, player in enumerate(players):
+            print(f"#{rank+1} {player.name: >8} {player.score: >4}")
 
 
