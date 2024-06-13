@@ -34,21 +34,30 @@ if __name__ == "__main__":
     game = Game(CLI())
         
     while True:
-        player = game.pick_player()
+        try:
+            player = game.pick_player()
 
-        # montrer l'interface du jeu
-        print()
-        game.ui.display_hand(player)
-        game.ui.display_tableau(player)
+            # montrer l'interface du jeu
+            print()
+            game.ui.display_hand(player)
+            game.ui.display_tableau(player)
 
-        # jouer une carte
+        # fins de boucle anticipées
+
+        # le joueur quitte avec les raccourcis ^C ou ^Z ou avec 
+        except (EOFError, InterruptedError, SystemExit):
+            break
+
+        # choisir une carte
         card_idx = game.ui.prompt_choice_card()
+
+        # si le joueur défausse
         if card_idx < 0:
             player.hand.pop(card_idx)
             game.turn_end = True
             continue
 
-        # choix de la cible
+        # choisir la cible
         if type(card := player.hand[card_idx]) is Hazard:
             target_idx = game.ui.prompt_choice_target(player, game.players)
             target = game.players[target_idx]
