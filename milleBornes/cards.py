@@ -117,29 +117,20 @@ class Safety(BaseCard):
 Card = Distance | Hazard | Remedy | Safety
 
 class CardShoe:
+    __card_classes: list[type] = [Distance, Hazard, Remedy, Safety]
+
     def __init__(self):
-        content: list[Card] = []
-        for card_class in (Distance, Hazard, Remedy, Safety):
-            content.extend(card_class.generate_all())
+        self.__content: list[Card] = sum((cls_.generate_all() for cls_ in self.__card_classes), [])
+        self.__remaining_distances: int = sum(Distance.get_content().values())
+        shuffle(self.__content)
 
-        self.__remaining_distances = sum(Distance.get_content().values())
-
-        shuffle(content)
-        self.__content = content
-
-    def deal(self) -> list[Card]:
-        hand = [self.__content.pop() for _ in range(Rule.FIRST_DEAL)]
-        self.__remaining_distances -= sum(card is Distance for card in hand)
-        return hand
+    def deal(self, number=Rule.FIRST_DEAL) -> list[Card]:
+        return [self.draw() for _ in range(number)]
 
     def has_distances(self) -> bool:
         return self.__remaining_distances != 0
 
     def draw(self) -> Card:
-        if not self.has_distances():
-            return Distance(0)
-        
-        card = self.__content.pop()
+        card = self.__content.pop() if self.has_distances() else Distance(0)
         self.__remaining_distances -= type(card) is Distance
-
         return card
