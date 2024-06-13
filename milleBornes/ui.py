@@ -25,6 +25,32 @@ class UI(ABC):
                 prompt = help
                 continue
 
+    @abstractmethod
+    def prompt_number_players(self) -> int:
+        pass
+
+    @abstractmethod
+    def display_hand(self, player: Player):
+        pass
+
+    @abstractmethod
+    def display_tableau(self, player: Player):
+        pass
+
+    @abstractmethod
+    def prompt_choice_card(self) -> int:
+        pass
+
+    @abstractmethod
+    def prompt_choice_target(self, attacker: Player, players: list[Player]) -> int:
+        pass
+
+    @abstractmethod
+    def display_game_end(self, players: list[Player]):
+        pass
+    
+
+
 class CLI(UI):
     COLOR: dict[type[Card], str] = {
         Distance: "\x1B[39m",
@@ -87,7 +113,7 @@ class CLI(UI):
             return -int(ans) - Rule.FIRST_DEAL - 1
             
 
-    def prompt_choice_target(self, attacker: Player, players: list[Player]):
+    def prompt_choice_target(self, attacker: Player, players: list[Player]) -> int:
         if len(players) == 2:
             return 1 - players.index(attacker)
 
@@ -107,7 +133,7 @@ class CLI(UI):
 
         return int(ans)
 
-    def display_ranking(self, players: list[Player]):
+    def display_game_end(self, players: list[Player]):
         players = sorted(players, key=lambda p: p.score, reverse=True)
         print(f"Le gagnant est {players[0].name}.")
         for rank, player in enumerate(players):

@@ -1,49 +1,57 @@
 # pyright: strict
 
 from milleBornes.players import *
-from milleBornes.ui import CLI
+from milleBornes.ui import CLI, UI
+
+class Game:
+    def __init__(self, ui: UI):
+        self.ui = ui
+        self.number_players = ui.prompt_number_players()
+        self.deck = CardShoe()
+        self.turn = -1
+        self.turn_end = True
+
+        self.players = [
+            Player(name=f"J{i}",
+                   hazards=State.RED_LIGHT,
+                   hand=self.deck.deal()
+            ) for i in range(self.number_players)
+        ]
+
+    def pick_player(self) -> Player:
+        self.turn += self.turn_end
+        player = self.players[self.turn % self.number_players]
+
+        if self.turn_end:
+            player.hand.append(self.deck.draw())
+            self.turn_end = False
+        
+        return player
+
+
 
 if __name__ == "__main__":
-    ui = CLI()
-    deck = CardShoe()  # création de la pioche
-
-    number_players = ui.prompt_number_players()
-    players = [
-        Player(name=f"J{i}",
-               hazards=State.RED_LIGHT,
-               hand=deck.deal()
-        ) for i in range(number_players)
-    ]
+    game = Game(CLI())
         
-    # compteurs et drapeau
-    turns: int = 0
-    turn_end = True
-    player = players[0]
-
     while True:
-        if turn_end:
-            player = players[turns % number_players]
-            card = deck.draw()
-            player.hand.append(card)
-            turn_end = False
+        player = game.pick_player()
 
         # montrer l'interface du jeu
         print()
-        ui.display_hand(player)
-        ui.display_tableau(player)
+        game.ui.display_hand(player)
+        game.ui.display_tableau(player)
 
         # jouer une carte
-        card_idx = ui.prompt_choice_card()
+        card_idx = game.ui.prompt_choice_card()
         if card_idx < 0:
             player.hand.pop(card_idx)
-            turn_end = True
-            turns += 1
+            game.turn_end = True
             continue
 
         # choix de la cible
         if type(card := player.hand[card_idx]) is Hazard:
-            target_idx = ui.prompt_choice_target(player, players)
-            target = players[target_idx]
+            target_idx = game.ui.prompt_choice_target(player, game.players)
+            target = game.players[target_idx]
             if player is target:
                 continue
         else:
@@ -64,7 +72,7 @@ if __name__ == "__main__":
             case Safety():
                 target.hazards &= ~card.value
                 target.safeties |= card.value
-                turns -= 1
+                game.turn -= 1
                 print("rejouez.")
             case Hazard():
                 for i, c in enumerate(target.hand):
@@ -72,20 +80,20 @@ if __name__ == "__main__":
                         print("Coup fourré !")
                         target.hand.pop(i)
                         target.safeties |= c.value
-                        card = deck.draw()
+                        card = game.deck.draw()
                         target.hand.append(card)
-                        turns = players.index(target) - 1
+                        turns = game.players.index(target) - 1
                         break
                 else:
                     target.hazards |= card.value
 
         # la carte jouée est défaussée
         player.hand.pop(card_idx)
-        turns += 1
-        turn_end = True
+        game.turn_end = True
 
         # check end of game
-        if player.score == Rule.WINNING_DISTANCE or not deck.has_distances():
+        if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
             break
 
-    ui.display_ranking(players)
+    game.ui.display_game_end(game.players)
+
