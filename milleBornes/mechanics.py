@@ -1,4 +1,4 @@
-from .players import Player
+from .players import Player, Status
 from .cards import *
 from .ui import UI
 
@@ -28,18 +28,15 @@ class Game:
         return player
 
     def play(self, player: Player, card: Card):
-        match card:
-            case Distance():
-                player.score += card.value
-                player.count200 += (card.value == 200)
-            case Remedy():
-                player.hazards &= ~card.value
-            case Safety():
-                player.hazards &= ~card.value
-                player.safeties |= card.value
-                self.turn -= 1
-                print("rejouez.")
+        player <<= card
+        
+        if player.status is Status.SAFETY:
+            print("__Rejouez.__")
+            self.turn -= 1
+        elif player.status is Status.COUNTER_TRHUST:
+            print("__Coup fourré !__")
+            player.hand.append(self.deck.draw())
+            self.turn = self.players.index(player) - 1
 
-            case _:
-                raise ValueError(f"The given case should have been handled elsewhere. Received: {card!r}")
-
+        player.status = Status.OK
+        self.turn_end = True

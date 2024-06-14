@@ -35,27 +35,8 @@ if __name__ == "__main__":
             else:
                 target = player
 
-            # vérifier que la carte est jouable
-            if not target.can_get(card):
-                print("Vous ne pouvez pas jouer cette carte.")
-                continue
-
-            # appliquer les effets de la carte sur la cible
-            match card:
-                case Distance() | Remedy() | Safety():
-                    game.play(target, card)
-                case Hazard():
-                    for i, c in enumerate(target.hand):
-                        if type(c) is Safety and card.value & c.value != State(0):
-                            print("Coup fourré !")
-                            target.hand.pop(i)
-                            target.safeties |= c.value
-                            card = game.deck.draw()
-                            target.hand.append(card)
-                            turns = game.players.index(target) - 1
-                            break
-                    else:
-                        target.hazards |= card.value
+            # la cible subit les effets de la carte
+            game.play(target, card)
 
             # la carte jouée est défaussée
             player.hand.pop(card_idx)
@@ -63,11 +44,14 @@ if __name__ == "__main__":
 
             # check end of game
             if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
-                game.ui.display_game_end(game.players)
                 break
 
         # le joueur quitte avec les raccourcis ^C ou ^Z ou avec 
-        except (EOFError, InterruptedError, SystemExit):
+        except (EOFError, SystemExit):
             break
+        except ValueError as v:
+            print(v)
+            continue
 
+    game.ui.display_game_end(game.players)
 
