@@ -83,6 +83,10 @@ class CLI(UI):
         # affichage nom du joueur
         print(player.name, end=" | ")
 
+        # afficher nombre de cartes 200 Bornes jouées
+        if player.count200 == Rule.MAX_USE_200:
+            print("MAX×200", end=" | ")
+
         # affichage distance
         print(f"{player.score}/{Rule.WINNING_DISTANCE}", end=" | ")
 
@@ -137,6 +141,6 @@ class CLI(UI):
         players = sorted(players, key=lambda p: p.score, reverse=True)
         print(f"Le gagnant est {players[0].name}.")
         for rank, player in enumerate(players):
-            print(f"#{rank+1} {player.name: >8} {player.score: >4}")
+            print(f"#{rank+1} {player.name: <8} {player.score: >4}")
 
 

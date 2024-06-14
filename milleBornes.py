@@ -1,33 +1,8 @@
 # pyright: strict
 
+from milleBornes.mechanics import Game
 from milleBornes.players import *
-from milleBornes.ui import CLI, UI
-
-class Game:
-    def __init__(self, ui: UI):
-        self.ui = ui
-        self.number_players = ui.prompt_number_players()
-        self.deck = CardShoe()
-        self.turn = -1
-        self.turn_end = True
-
-        self.players = [
-            Player(name=f"J{i}",
-                   hazards=State.RED_LIGHT,
-                   hand=self.deck.deal()
-            ) for i in range(self.number_players)
-        ]
-
-    def pick_player(self) -> Player:
-        self.turn += self.turn_end
-        player = self.players[self.turn % self.number_players]
-
-        if self.turn_end:
-            player.hand.append(self.deck.draw())
-            self.turn_end = False
-
-        return player
-
+from milleBornes.ui import CLI
 
 
 if __name__ == "__main__":
@@ -67,16 +42,8 @@ if __name__ == "__main__":
 
             # appliquer les effets de la carte sur la cible
             match card:
-                case Distance():
-                    target.score += card.value
-                    target.count200 += (card.value == 200)
-                case Remedy():
-                    target.hazards &= ~card.value
-                case Safety():
-                    target.hazards &= ~card.value
-                    target.safeties |= card.value
-                    game.turn -= 1
-                    print("rejouez.")
+                case Distance() | Remedy() | Safety():
+                    game.play(target, card)
                 case Hazard():
                     for i, c in enumerate(target.hand):
                         if type(c) is Safety and card.value & c.value != State(0):
