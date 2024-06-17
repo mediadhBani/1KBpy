@@ -62,7 +62,7 @@ class Hazard(BaseCard):
     def __str__(self) -> str:
         match self.value:
             case State.RED_LIGHT: return "Feu rouge"
-            case State.SPEED_LIMIT: return "Limite de vitesse (50 bornes/tour)"
+            case State.SPEED_LIMIT: return "Limite de vitesse"
             case State.OUT_OF_FUEL: return "Panne d'essence"
             case State.FLAT_TIRE: return "Crevaison"
             case State.ACCIDENT: return "Accident"
