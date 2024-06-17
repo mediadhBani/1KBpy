@@ -128,7 +128,7 @@ class CardShoe:
         return [self.draw() for _ in range(number)]
 
     def has_distances(self) -> bool:
-        return self.__remaining_distances != 0
+        return self.__remaining_distances > 0
 
     def draw(self) -> Card:
         card = self.__content.pop() if self.has_distances() else Distance(0)

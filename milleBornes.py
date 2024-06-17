@@ -49,8 +49,8 @@ if __name__ == "__main__":
         # le joueur quitte avec les raccourcis ^C ou ^Z ou avec 
         except (EOFError, SystemExit):
             break
-        except ValueError as v:
-            print(v)
+        except ValueError as exc:
+            print(exc)
             continue
 
     game.ui.display_game_end(game.players)
