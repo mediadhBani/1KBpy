@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from sys import exit
 from .players import Player
 from .cards import Card, State, Distance, Hazard, Remedy, Rule, Safety
+from .mechanics import Game
 
 
 class UI(ABC):
@@ -74,6 +75,23 @@ class CLI(UI):
             exit(0)
 
         return self.number_players
+
+    def display_ui(self, game: Game):
+        # effacer écran
+        print("\x1B[2J\x1B[H", end="")
+
+        # panneau gauche
+        current_player = game.pick_player()
+        self.display_hand(current_player)
+        
+        # panneau droite
+        for i, player in enumerate(game.players):
+            print(f"\x1B[{2*i};35H  {i}: ", end="")
+            self.display_tableau(player)
+
+        print(f"\x1B[{2 * game.players.index(current_player)};35H>", end="\x1B[999;H")
+        
+        
 
     def display_hand(self, player: Player):
         for i, card in enumerate(player.hand):

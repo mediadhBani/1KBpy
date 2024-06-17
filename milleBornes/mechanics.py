@@ -1,11 +1,9 @@
 from .players import Player, Status
 from .cards import *
-from .ui import UI
 
 class Game:
-    def __init__(self, ui: UI):
-        self.ui = ui
-        self.number_players = ui.prompt_number_players()
+    def __init__(self, number_players: int):
+        self.number_players = number_players
         self.deck = CardShoe()
         self.turn = -1
         self.turn_end = True

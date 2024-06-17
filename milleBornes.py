@@ -6,7 +6,8 @@ from milleBornes.ui import CLI
 
 
 if __name__ == "__main__":
-    game = Game(CLI())
+    ui = CLI()
+    game = Game(ui.prompt_number_players())
 
     while True:
         try:
@@ -14,11 +15,11 @@ if __name__ == "__main__":
 
             # montrer l'interface du jeu
             print()
-            game.ui.display_hand(player)
-            game.ui.display_tableau(player)
+            ui.display_hand(player)
+            ui.display_tableau(player)
 
             # choisir une carte
-            card_idx = game.ui.prompt_choice_card()
+            card_idx = ui.prompt_choice_card()
 
             # si le joueur défausse
             if card_idx < 0:
@@ -28,7 +29,7 @@ if __name__ == "__main__":
 
             # choisir la cible
             if type(card := player.hand[card_idx]) is Hazard:
-                target_idx = game.ui.prompt_choice_target(player, game.players)
+                target_idx = ui.prompt_choice_target(player, game.players)
                 target = game.players[target_idx]
                 if player is target:
                     continue
@@ -53,5 +54,5 @@ if __name__ == "__main__":
             print(exc)
             continue
 
-    game.ui.display_game_end(game.players)
+    ui.display_game_end(game.players)
 
