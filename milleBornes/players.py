@@ -41,10 +41,10 @@ class Player:
         self.hazards &= ~state
 
     def take_hazard(self, hazard: State):
-        if hazard is State.SPEED and hazard in self.hazards:
+        if hazard & self.hazards is State.SPEED:
             raise ValueError("Votre adversaire est déjà ralenti.")
 
-        if hazard in (self.hazards & ~State.SPEED):
+        if hazard in ~State.SPEED and self.hazards.ignore_speed():
             raise ValueError("Votre adversaire est déjà immobilisé.")
 
         if hazard in self.safeties:
@@ -57,8 +57,8 @@ class Player:
                 self.hazards &= ~safety
                 self.safeties |= safety
                 break
-            else:
-                self.hazards |= hazard
+        else:
+            self.hazards |= hazard
 
     def run(self, distance: int):
         if (state := self.hazards.ignore_speed()) != State(0):
