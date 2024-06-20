@@ -1,21 +1,33 @@
 from abc import ABC, abstractmethod
 from random import shuffle
 from dataclasses import dataclass
-from enum import IntFlag, auto, IntEnum
+from enum import Flag, auto, IntEnum
 from typing import Any, Self
 
 class Rule(IntEnum):
     FIRST_DEAL = 6
     MAX_USE_200 = 2
-    SPEED_LIMIT = 50
+    SPEED = 50
     WINNING_DISTANCE = 1000
 
-class State(IntFlag):
-    RED_LIGHT = auto()
-    SPEED_LIMIT = auto()
-    OUT_OF_FUEL = auto()
-    FLAT_TIRE = auto()
+class State(Flag):
+    SPEED = auto()
+    LIGHT = auto()
+    FUEL = auto()
+    TIRE = auto()
     ACCIDENT = auto()
+    PRIORITY = SPEED | LIGHT
+
+    def ignore_speed(self):
+        return self & ~self.SPEED
+
+    def iter_safety(self):
+        if self.PRIORITY in self:
+            yield self.PRIORITY
+
+        for s in ~self.PRIORITY & self:
+            yield s
+
 
 @dataclass(frozen=True, slots=True)
 class BaseCard(ABC):
@@ -52,22 +64,22 @@ class Hazard(BaseCard):
     @classmethod
     def get_content(cls) -> dict[State, int]:
         return {
-            State.RED_LIGHT: 5,
-            State.SPEED_LIMIT: 4,
-            State.OUT_OF_FUEL: 3,
-            State.FLAT_TIRE: 3,
+            State.LIGHT: 5,
+            State.SPEED: 4,
+            State.FUEL: 3,
+            State.TIRE: 3,
             State.ACCIDENT: 3,
         }
 
     def __str__(self) -> str:
         match self.value:
-            case State.RED_LIGHT: return "Feu rouge"
-            case State.SPEED_LIMIT: return "Limite de vitesse"
-            case State.OUT_OF_FUEL: return "Panne d'essence"
-            case State.FLAT_TIRE: return "Crevaison"
+            case State.LIGHT: return "Feu rouge"
+            case State.SPEED: return "Limite de vitesse"
+            case State.FUEL: return "Panne d'essence"
+            case State.TIRE: return "Crevaison"
             case State.ACCIDENT: return "Accident"
 
-        raise ValueError(f"Carte Corrompue ! Valeur reçue : {self.value!r}")
+        raise ValueError(f"Carte Corrompue ! Valeur reçue : {self!r}")
     
 class Remedy(BaseCard):
     value: State
@@ -75,22 +87,22 @@ class Remedy(BaseCard):
     @classmethod
     def get_content(cls) -> dict[State, int]:
         return {
-            State.RED_LIGHT: 14,
-            State.SPEED_LIMIT: 6,
-            State.OUT_OF_FUEL: 6,
-            State.FLAT_TIRE: 6,
+            State.LIGHT: 14,
+            State.SPEED: 6,
+            State.FUEL: 6,
+            State.TIRE: 6,
             State.ACCIDENT: 6,
         }       
 
     def __str__(self) -> str:
         match self.value:
-            case State.RED_LIGHT: return "Feu vert"
-            case State.SPEED_LIMIT: return "Fin de limite de vitesse"
-            case State.OUT_OF_FUEL: return "Essence"
-            case State.FLAT_TIRE: return "Roue de Secours"
+            case State.LIGHT: return "Feu vert"
+            case State.SPEED: return "Fin de limite de vitesse"
+            case State.FUEL: return "Essence"
+            case State.TIRE: return "Roue de Secours"
             case State.ACCIDENT: return "Réparations"
 
-        raise ValueError(f"Carte Corrompue ! Valeur reçue : {self.value!r}")
+        raise ValueError(f"Carte Corrompue ! Valeur reçue : {self!r}")
 
 class Safety(BaseCard):
     value: State
@@ -98,21 +110,30 @@ class Safety(BaseCard):
     @classmethod
     def get_content(cls) -> dict[State, int]:
         return {
-            State.RED_LIGHT | State.SPEED_LIMIT: 1,
-            State.OUT_OF_FUEL: 1,
-            State.FLAT_TIRE: 1,
+            State.PRIORITY: 1,
+            State.FUEL: 1,
+            State.TIRE: 1,
             State.ACCIDENT: 1,
         }       
 
     def __str__(self) -> str:
-        match self.value:
-            case State.RED_LIGHT | State.SPEED_LIMIT: return "Véhicule prioritaire"
-            case State.OUT_OF_FUEL: return "Citerne d'essence"
-            case State.FLAT_TIRE: return "Increvable"
-            case State.ACCIDENT: return "As du volant"
+        value = self.value
 
-        if self.value is State.RED_LIGHT | State.SPEED_LIMIT:
+        if value is State.PRIORITY:
             return "Véhicule prioritaire"
+        if value is State.FUEL:
+            return "Citerne d'essence"
+        if value is State.TIRE:
+            return "Increvable"
+        if value is State.ACCIDENT:
+            return "As du volant"
+
+        raise ValueError(f"Carte Corrompue ! Valeur reçue : {self!r}")
+
+    def __iter__(self):
+        for s in self.get_content().keys():
+            if s in self.value:
+                yield s
 
 Card = Distance | Hazard | Remedy | Safety
 

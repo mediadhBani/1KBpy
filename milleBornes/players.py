@@ -12,7 +12,7 @@ class Player:
     name: str
     score: int = 0
     count200: int = 0
-    hazards: State = State(0)
+    hazards: State = State.LIGHT
     safeties: State = State(0)
     status: Status = Status.OK
     hand: list[Card] = field(default_factory=list)
@@ -41,10 +41,10 @@ class Player:
         self.hazards &= ~state
 
     def take_hazard(self, hazard: State):
-        if hazard is State.SPEED_LIMIT and hazard in self.hazards:
+        if hazard is State.SPEED and hazard in self.hazards:
             raise ValueError("Votre adversaire est déjà ralenti.")
 
-        if hazard in (self.hazards & ~State.SPEED_LIMIT):
+        if hazard in (self.hazards & ~State.SPEED):
             raise ValueError("Votre adversaire est déjà immobilisé.")
 
         if hazard in self.safeties:
@@ -61,11 +61,11 @@ class Player:
                 self.hazards |= hazard
 
     def run(self, distance: int):
-        if (state := self.hazards & ~State.SPEED_LIMIT) != State(0):
+        if (state := self.hazards.ignore_speed()) != State(0):
             raise ValueError(f"Trouvez d'abord une solution à votre {Hazard(state)} !")
         
-        if State.SPEED_LIMIT in self.hazards and distance > Rule.SPEED_LIMIT:
-            raise ValueError(f"Vous ne pouvez pas dépasser les {Rule.SPEED_LIMIT} Bornes par tour.")
+        if State.SPEED in self.hazards and distance > Rule.SPEED:
+            raise ValueError(f"Vous ne pouvez pas dépasser les {Rule.SPEED} Bornes par tour.")
 
         if self.count200 >= Rule.MAX_USE_200 and distance == 200:
             raise ValueError(f"Vous ne pouvez plus jouer de carte 200 Bornes.")

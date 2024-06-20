@@ -10,7 +10,7 @@ class Game:
 
         self.players = [
             Player(name=f"J{i}",
-                   hazards=State.RED_LIGHT,
+                   hazards=State.LIGHT,
                    hand=self.deck.deal()
             ) for i in range(self.number_players)
         ]

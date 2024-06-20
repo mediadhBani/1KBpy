@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from sys import exit
 from .players import Player
-from .cards import Card, State, Distance, Hazard, Remedy, Rule, Safety
+from .cards import Card, Distance, Hazard, Remedy, Rule, Safety
 from .mechanics import Game
 
 
@@ -109,7 +109,7 @@ class CLI(UI):
         print(f"{player.score}/{Rule.WINNING_DISTANCE}", end=" | ")
 
         # affichage bottes
-        states = map(Safety, player.safeties & ~State.SPEED_LIMIT)
+        states = map(Safety, player.safeties.iter_safety())
         states = map((self.COLOR[Safety] + "{}\x1B[m").format, states)
         print(", ".join(states) or "aucune botte", end=" | ")
 
