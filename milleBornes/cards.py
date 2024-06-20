@@ -1,14 +1,11 @@
 from abc import ABC, abstractmethod
 from random import shuffle
 from dataclasses import dataclass
-from enum import Flag, auto, IntEnum
+from enum import Flag, auto
 from typing import Any, Self
 
-class Rule(IntEnum):
-    FIRST_DEAL = 6
-    MAX_USE_200 = 2
-    SPEED = 50
-    WINNING_DISTANCE = 1000
+from .rules import Rule
+
 
 class State(Flag):
     SPEED = auto()

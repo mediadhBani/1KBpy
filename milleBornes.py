@@ -3,6 +3,7 @@
 from milleBornes.mechanics import Game
 from milleBornes.players import *
 from milleBornes.ui import CLI
+from milleBornes.rules import BadMove
 
 
 if __name__ == "__main__":
@@ -50,8 +51,8 @@ if __name__ == "__main__":
         # le joueur quitte avec les raccourcis ^C ou ^Z ou avec 
         except (EOFError, SystemExit):
             break
-        except ValueError as exc:
-            print(exc)
+        except BadMove as exc:
+            print(f"\x1B[33m{exc}\x1B[m")
             continue
 
     ui.display_game_end(game.players)

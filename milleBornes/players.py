@@ -1,5 +1,8 @@
-from milleBornes.cards import *
 from dataclasses import dataclass, field
+from enum import IntEnum
+
+from .cards import *
+from .rules import BadMove, Rule
 
 class Status(IntEnum):
     OK = 0
@@ -33,22 +36,22 @@ class Player:
 
     def take_remedy(self, state: State):
         if self.hazards is State(0):
-            raise ValueError(f"Vous n'avez rien à parer.")
+            raise BadMove("Vous n'avez rien à parer.")
 
         if self.hazards & state is State(0):
-            raise ValueError(f"Vous ne pouvez pas parer avec une carte {Remedy(state)}.")
+            raise BadMove("Votre parade ne correspond pas à l'attaque que vous subissez.")
 
         self.hazards &= ~state
 
     def take_hazard(self, hazard: State):
         if hazard & self.hazards is State.SPEED:
-            raise ValueError("Votre adversaire est déjà ralenti.")
+            raise BadMove("Votre adversaire roule déjà au ralenti.")
 
         if hazard in ~State.SPEED and self.hazards.ignore_speed():
-            raise ValueError("Votre adversaire est déjà immobilisé.")
+            raise BadMove("Votre adversaire subit déjà les effets d'une autre attaque.")
 
         if hazard in self.safeties:
-            raise ValueError(f"Votre adversaire est immunisé contre {Hazard(hazard)}.")
+            raise BadMove("Cette attaque n'a plus d'effet sur votre adversaire.")
 
         for i, card in enumerate(self.hand):
             if type(card) is Safety and hazard in (safety := card.value):
@@ -61,17 +64,17 @@ class Player:
             self.hazards |= hazard
 
     def run(self, distance: int):
-        if (state := self.hazards.ignore_speed()) != State(0):
-            raise ValueError(f"Trouvez d'abord une solution à votre {Hazard(state)} !")
+        if self.hazards.ignore_speed() != State(0):
+            raise BadMove("Vous êtes sous l'effet d'un attaque et ne pouvez donc pas rouler.")
         
         if State.SPEED in self.hazards and distance > Rule.SPEED:
-            raise ValueError(f"Vous ne pouvez pas dépasser les {Rule.SPEED} Bornes par tour.")
+            raise BadMove(f"Vous ne pouvez pas dépasser les {Rule.SPEED} Bornes par tour.")
 
         if self.count200 >= Rule.MAX_USE_200 and distance == 200:
-            raise ValueError(f"Vous ne pouvez plus jouer de carte 200 Bornes.")
+            raise BadMove("Vous ne pouvez plus jouer de carte 200 Bornes.")
 
         if self.score + distance > Rule.WINNING_DISTANCE:
-            raise ValueError(f"Vous ne pouvez pas dépasser les 1000 Bornes !")
+            raise BadMove("Vous ne pouvez pas dépasser les 1000 Bornes !")
 
         self.score += distance
         self.count200 += (distance == 200)
