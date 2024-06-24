@@ -15,9 +15,7 @@ if __name__ == "__main__":
             player = game.pick_player()
 
             # montrer l'interface du jeu
-            print()
-            ui.display_hand(player)
-            ui.display_tableau(player)
+            ui.display_ui(game)
 
             # choisir une carte
             card_idx = ui.prompt_choice_card()
