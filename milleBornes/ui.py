@@ -1,9 +1,9 @@
 from abc import ABC, abstractmethod
 from sys import exit
 from .players import Player
-from .cards import Card, Distance, Hazard, Remedy, Rule, Safety
+from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
 from .mechanics import Game
-
+from milleBornes import players
 
 class UI(ABC):
     @abstractmethod
@@ -61,7 +61,8 @@ class CLI(UI):
     }
 
     def __init__(self):
-        self.number_players = 0
+        self.number_players: int = 0
+        self.errmsg: str = ""
 
     def prompt_number_players(self) -> int:
         ans = self.input(
@@ -89,7 +90,8 @@ class CLI(UI):
             print(f"\x1B[{2*i};35H  {i}: ", end="")
             self.display_tableau(player)
 
-        print(f"\x1B[{2 * game.players.index(current_player)};35H>", end="\x1B[999;H")
+        print(f"\x1B[{2 * game.players.index(current_player)};35H>")
+        print("\x1B[6;35H\x1B[K\x1B[33m", self.errmsg, end="\x1B[m\x1B[999;H")
         
         
 
@@ -99,24 +101,34 @@ class CLI(UI):
 
     def display_tableau(self, player: Player):
         # affichage nom du joueur
-        print(player.name, end=" | ")
+        print(f"{player.name.upper():>3.3} | ", end="")
 
         # afficher nombre de cartes 200 Bornes jouées
         if player.count200 == Rule.MAX_USE_200:
-            print("MAX×200", end=" | ")
+            print("\x1B[31m", end="")      
+        print(f"{player.count200}×200\x1B[m | ", end="")
 
         # affichage distance
-        print(f"{player.score}/{Rule.WINNING_DISTANCE}", end=" | ")
+        print(f"{player.score:>04}/{Rule.WINNING_DISTANCE} | ", end="")
 
-        # affichage bottes
-        states = map(Safety, player.safeties.iter_safety())
-        states = map((self.COLOR[Safety] + "{}\x1B[m").format, states)
-        print(", ".join(states) or "aucune botte", end=" | ")
+        # affichage états
+        for state in State:
+            match state:
+                case State.SPEED: shorthand = "LIM "
+                case State.LIGHT: shorthand = "FEU"
+                case State.FUEL: shorthand = "ESS"
+                case State.TIRE: shorthand = "ROU"
+                case State.ACCIDENT: shorthand = "ACC"
 
-        # affichage attaque
-        states = map(Hazard, player.hazards)
-        states = map((self.COLOR[Hazard] + "{}\x1B[m").format, states)
-        print(", ".join(states) or "La voie est libre.")
+            if state in player.safeties:
+                clr = 32
+            elif state in player.hazards:
+                clr = 31
+            else:
+                clr = 2
+                
+            print(f"\x1B[{clr}m{shorthand}", end="\x1B[m ")
+        print("\x1B[m")
 
 
     def prompt_choice_card(self) -> int:

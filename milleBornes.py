@@ -15,9 +15,7 @@ if __name__ == "__main__":
             player = game.pick_player()
 
             # montrer l'interface du jeu
-            print()
-            ui.display_hand(player)
-            ui.display_tableau(player)
+            ui.display_ui(game)
 
             # choisir une carte
             card_idx = ui.prompt_choice_card()
@@ -43,6 +41,7 @@ if __name__ == "__main__":
             # la carte jouée est défaussée
             player.hand.pop(card_idx)
             game.turn_end = True
+            ui.errmsg = ""
 
             # check end of game
             if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
@@ -52,7 +51,7 @@ if __name__ == "__main__":
         except (EOFError, SystemExit):
             break
         except BadMove as exc:
-            print(f"\x1B[33m{exc}\x1B[m")
+            ui.errmsg = str(exc)
             continue
 
     ui.display_game_end(game.players)
