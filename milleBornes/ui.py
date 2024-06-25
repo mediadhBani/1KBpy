@@ -3,7 +3,6 @@ from sys import exit
 from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
 from .mechanics import Game
-from milleBornes import players
 
 class UI(ABC):
     @abstractmethod
@@ -109,26 +108,35 @@ class CLI(UI):
         print(f"{player.count200}×200\x1B[m | ", end="")
 
         # affichage distance
-        print(f"{player.score:>04}/{Rule.WINNING_DISTANCE} | ", end="")
+        print(f"{player.score:>4}/{Rule.WINNING_DISTANCE} | ", end="\x1B[s")
 
         # affichage états
+        fmt = "\x1B[{}C\x1B[{}m{}"
+        offset, shorthand = 0, ""
         for state in State:
-            match state:
-                case State.SPEED: shorthand = "LIM "
-                case State.LIGHT: shorthand = "FEU"
-                case State.FUEL: shorthand = "ESS"
-                case State.TIRE: shorthand = "ROU"
-                case State.ACCIDENT: shorthand = "ACC"
-
-            if state in player.safeties:
-                clr = 32
-            elif state in player.hazards:
-                clr = 31
+            if state is State.SPEED:
+                offset, shorthand = -1, "LIM"
+            elif state is State.LIGHT:
+                offset, shorthand = 5, "FEU"
+            elif state is State.FUEL:
+                offset, shorthand = 9, "ESS"
+            elif state is State.TIRE:
+                offset, shorthand = 13, "ROU"
+            elif state is State.ACCIDENT:
+                offset, shorthand = 17, "ACC"
             else:
-                clr = 2
+                raise ValueError("shorthand error")
+
+
+            color = 2
+            if state in player.safeties:
+                color = 32
+            elif state in player.hazards:
+                color = 31
                 
-            print(f"\x1B[{clr}m{shorthand}", end="\x1B[m ")
-        print("\x1B[m")
+
+            print(fmt.format(offset, color, shorthand), end="\x1B[m\x1B[u")
+        print()
 
 
     def prompt_choice_card(self) -> int:
