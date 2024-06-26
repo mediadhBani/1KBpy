@@ -19,6 +19,7 @@ if __name__ == "__main__":
 
             # choisir une carte
             card_idx = ui.prompt_choice_card()
+            ui.errmsg = ""
 
             # si le joueur défausse
             if card_idx < 0:
@@ -41,7 +42,6 @@ if __name__ == "__main__":
             # la carte jouée est défaussée
             player.hand.pop(card_idx)
             game.turn_end = True
-            ui.errmsg = ""
 
             # check end of game
             if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
