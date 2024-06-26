@@ -86,10 +86,10 @@ class CLI(UI):
         
         # panneau droite
         for i, player in enumerate(game.players):
-            print(f"\x1B[{2*i};35H  {i}: ", end="")
+            print(f"\x1B[{i+1};35H  {i}: ", end="")
             self.display_tableau(player)
 
-        print(f"\x1B[{2 * game.players.index(current_player)};35H>")
+        print(f"\x1B[{game.players.index(current_player) + 1};35H>")
         print("\x1B[6;35H\x1B[K\x1B[33m", self.errmsg, end="\x1B[m\x1B[999;H")
         
         
