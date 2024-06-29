@@ -16,29 +16,24 @@ if __name__ == "__main__":
 
         try:
             card_idx = ui.prompt_choice_card()
-
-            if (card := player.hand[card_idx]).is_hazard():
-                target_idx = ui.prompt_choice_target(player, game.players)
-                target = game.players[target_idx]
-                if player is target:
-                    continue
-            else:
-                target = player
         except (EOFError, SystemExit):
             break
 
-        # si le joueur défausse
-        if card_idx < 0:
-            player.hand.pop(card_idx)
-            game.turn_end = True
-            continue
 
-        # la cible subit les effets de la carte
-        try:
-            game.play(target, card)
-        except BadMove as exc:
-            ui.errmsg = str(exc)
-            continue
+        # si le joueur ne défausse pas
+        if card_idx >= 0:
+            try:
+                if (card := player.hand[card_idx]).is_hazard():
+                    target_idx = ui.prompt_choice_target(player, game.players)
+                    if player is (target := game.players[target_idx]):
+                        raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
+                else:
+                    target = player
+
+                game.play(target, card)
+            except BadMove as exc:
+                ui.errmsg = str(exc)
+                continue
 
         # la carte jouée est défaussée
         player.hand.pop(card_idx)
