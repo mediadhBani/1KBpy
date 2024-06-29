@@ -2,7 +2,7 @@
 
 from milleBornes.mechanics import Game
 from milleBornes.ui import CLI
-from milleBornes.rules import BadMove, Rule
+from milleBornes.rules import BadMove
 
 
 if __name__ == "__main__":
@@ -40,7 +40,7 @@ if __name__ == "__main__":
         game.turn_end = True
 
         # check end of game
-        if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
+        if game.is_over():
             break
 
     ui.display_game_end(game.players)

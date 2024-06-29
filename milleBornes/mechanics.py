@@ -15,6 +15,9 @@ class Game:
             ) for i in range(self.number_players)
         ]
 
+    def is_over(self) -> bool:
+        return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
+
     def pick_player(self) -> Player:
         self.turn += self.turn_end
         player = self.players[self.turn % self.number_players]
@@ -23,6 +26,7 @@ class Game:
             player.hand.append(self.deck.draw())
             self.turn_end = False
 
+        self.current_player = player
         return player
 
     def play(self, player: Player, card: Card):
