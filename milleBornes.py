@@ -1,9 +1,8 @@
 # pyright: strict
 
 from milleBornes.mechanics import Game
-from milleBornes.players import *
 from milleBornes.ui import CLI
-from milleBornes.rules import BadMove
+from milleBornes.rules import BadMove, Rule
 
 
 if __name__ == "__main__":
@@ -18,7 +17,7 @@ if __name__ == "__main__":
         try:
             card_idx = ui.prompt_choice_card()
 
-            if type(card := player.hand[card_idx]) is Hazard:
+            if (card := player.hand[card_idx]).is_hazard():
                 target_idx = ui.prompt_choice_target(player, game.players)
                 target = game.players[target_idx]
                 if player is target:

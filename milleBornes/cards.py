@@ -41,6 +41,9 @@ class BaseCard(ABC):
         cards: list[Self] = []
         return sum((v * [cls(k)] for k, v in cls.get_content().items()), cards)
 
+    def is_hazard(self) -> bool:
+        return type(self) is Hazard
+
 class Distance(BaseCard):
     @classmethod
     def get_content(cls) -> dict[int, int]:
