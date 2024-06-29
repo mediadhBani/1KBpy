@@ -11,23 +11,13 @@ if __name__ == "__main__":
     game = Game(ui.prompt_number_players())
 
     while True:
+        player = game.pick_player()
+        ui.display_ui(game)
+        ui.errmsg = ""
+
         try:
-            player = game.pick_player()
-
-            # montrer l'interface du jeu
-            ui.display_ui(game)
-
-            # choisir une carte
             card_idx = ui.prompt_choice_card()
-            ui.errmsg = ""
 
-            # si le joueur défausse
-            if card_idx < 0:
-                player.hand.pop(card_idx)
-                game.turn_end = True
-                continue
-
-            # choisir la cible
             if type(card := player.hand[card_idx]) is Hazard:
                 target_idx = ui.prompt_choice_target(player, game.players)
                 target = game.players[target_idx]
@@ -35,24 +25,29 @@ if __name__ == "__main__":
                     continue
             else:
                 target = player
-
-            # la cible subit les effets de la carte
-            game.play(target, card)
-
-            # la carte jouée est défaussée
-            player.hand.pop(card_idx)
-            game.turn_end = True
-
-            # check end of game
-            if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
-                break
-
-        # le joueur quitte avec les raccourcis ^C ou ^Z ou avec 
         except (EOFError, SystemExit):
             break
+
+        # si le joueur défausse
+        if card_idx < 0:
+            player.hand.pop(card_idx)
+            game.turn_end = True
+            continue
+
+        # la cible subit les effets de la carte
+        try:
+            game.play(target, card)
         except BadMove as exc:
             ui.errmsg = str(exc)
             continue
+
+        # la carte jouée est défaussée
+        player.hand.pop(card_idx)
+        game.turn_end = True
+
+        # check end of game
+        if player.score == Rule.WINNING_DISTANCE or not game.deck.has_distances():
+            break
 
     ui.display_game_end(game.players)
 

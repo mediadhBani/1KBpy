@@ -1,11 +1,8 @@
-# Mille Bornes
+# 1KBpy
+Jeu du 1000 Bornes implémenté en Python 3.
 
-Jeu du 1000 Bornes implémenté en Python 3. Il peut y avoir entre 2 et 4 joueurs.
-
-## Fonctionnalités
-
-[x] jouable en ligne de commande
-[ ] jouable sur interface graphique
-[ ] option de sauvegarde
-[ ] robot contre qui jouer
-
+## Features
+- jouable en ligne de commande
+- option de sauvegarde
+- jusqu'à 6 joueurs
+- fin de partie automatique si plus aucune carte borne
