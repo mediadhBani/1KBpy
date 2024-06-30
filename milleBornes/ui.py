@@ -2,7 +2,7 @@ from abc import ABC, abstractmethod
 from sys import exit
 from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
-from .mechanics import Game
+# from .mechanics import Game
 
 class UI(ABC):
     @abstractmethod
@@ -24,32 +24,6 @@ class UI(ABC):
             except ValueError:
                 prompt = help
                 continue
-
-    @abstractmethod
-    def prompt_number_players(self) -> int:
-        pass
-
-    @abstractmethod
-    def display_hand(self, player: Player):
-        pass
-
-    @abstractmethod
-    def display_tableau(self, player: Player):
-        pass
-
-    @abstractmethod
-    def prompt_choice_card(self) -> int:
-        pass
-
-    @abstractmethod
-    def prompt_choice_target(self, attacker: Player, players: list[Player]) -> int:
-        pass
-
-    @abstractmethod
-    def display_game_end(self, players: list[Player]):
-        pass
-    
-
 
 class CLI(UI):
     COLOR: dict[type[Card], str] = {
@@ -76,7 +50,7 @@ class CLI(UI):
 
         return self.number_players
 
-    def display_ui(self, game: Game):
+    def display_ui(self, game):
         # effacer écran
         print("\x1B[2J\x1B[H", end="")
 

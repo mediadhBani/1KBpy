@@ -1,5 +1,7 @@
 from .players import Player, Status
 from .cards import *
+from .ui import CLI
+
 
 class Game:
     def __init__(self, number_players: int):
@@ -7,7 +9,7 @@ class Game:
         self.deck = CardShoe()
         self.turn = -1
         self.turn_end = True
-
+        self.ui = CLI()
         self.players = [
             Player(name=f"J{i}",
                    hazards=State.LIGHT,
@@ -15,19 +17,35 @@ class Game:
             ) for i in range(self.number_players)
         ]
 
+    def render_state(self):
+        # effacer écran
+        print("\x1B[2J\x1B[H", end="")
+
+        # panneau gauche
+        current_player = self.pick_player()
+        self.ui.display_hand(current_player)
+        
+        # panneau droite
+        for i, player in enumerate(self.players):
+            print(f"\x1B[{i+1};35H  {i}: ", end="")
+            self.ui.display_tableau(player)
+
+        print(f"\x1B[{self.players.index(current_player) + 1};35H>")
+        print("\x1B[6;35H\x1B[K\x1B[33m", self.ui.errmsg, end="\x1B[m\x1B[999;H")
+
+
     def is_over(self) -> bool:
         return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
 
     def pick_player(self) -> Player:
         self.turn += self.turn_end
-        player = self.players[self.turn % self.number_players]
+        self.current_player = self.players[self.turn % self.number_players]
 
         if self.turn_end:
-            player.hand.append(self.deck.draw())
+            self.current_player.hand.append(self.deck.draw())
             self.turn_end = False
 
-        self.current_player = player
-        return player
+        return self.current_player
 
     def play(self, player: Player, card: Card):
         player <<= card
@@ -42,3 +60,4 @@ class Game:
 
         player.status = Status.OK
         self.turn_end = True
+

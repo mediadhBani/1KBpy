@@ -10,8 +10,13 @@ if __name__ == "__main__":
     game = Game(ui.prompt_number_players())
 
     while True:
+        game.render_state()
+        # game.prompt_action()
+        # game.do_action()
+        # if game.is_over():
+        #     break
+        
         player = game.pick_player()
-        ui.display_ui(game)
         ui.errmsg = ""
 
         try:
