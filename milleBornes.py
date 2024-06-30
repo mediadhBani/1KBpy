@@ -11,9 +11,12 @@ if __name__ == "__main__":
 
     while True:
         player = game.pick_player()
-        ui.display_ui(game)
-        ui.errmsg = ""
-
+        game.render_state()
+        # game.prompt_action()
+        # game.do_action()
+        # if game.is_over():
+        #     break
+        
         try:
             card_idx = ui.prompt_choice_card()
         except (EOFError, SystemExit):
@@ -32,7 +35,7 @@ if __name__ == "__main__":
 
                 game.play(target, card)
             except BadMove as exc:
-                ui.errmsg = str(exc)
+                game.ui.errmsg = str(exc)
                 continue
 
         # la carte jouée est défaussée
