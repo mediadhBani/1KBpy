@@ -25,6 +25,7 @@ class UI(ABC):
                 prompt = help
                 continue
 
+
 class CLI(UI):
     COLOR: dict[type[Card], str] = {
         Distance: "\x1B[39m",
@@ -50,28 +51,16 @@ class CLI(UI):
 
         return self.number_players
 
-    def display_ui(self, game):
-        # effacer écran
-        print("\x1B[2J\x1B[H", end="")
-
-        # panneau gauche
-        current_player = game.pick_player()
-        self.display_hand(current_player)
-        
-        # panneau droite
-        for i, player in enumerate(game.players):
-            print(f"\x1B[{i+1};35H  {i}: ", end="")
-            self.display_tableau(player)
-
-        print(f"\x1B[{game.players.index(current_player) + 1};35H>")
-        print("\x1B[6;35H\x1B[K\x1B[33m", self.errmsg, end="\x1B[m\x1B[999;H")
-        
-        
-
     def display_hand(self, player: Player):
         for i, card in enumerate(player.hand):
             print(f"{i}: {self.COLOR[type(card)]}{card}\x1B[m")
 
+    def display_tableaus(self, players: list[Player], idx_current_player: int):
+        for i, player in enumerate(players):
+            print(f"\x1B[{i+1};35H  {i}: ", end="")
+            self.display_tableau(player)
+        print(f"\x1B[{idx_current_player + 1};35H>")
+            
     def display_tableau(self, player: Player):
         # affichage nom du joueur
         print(f"{player.name.upper():>3.3} | ", end="")
@@ -108,10 +97,12 @@ class CLI(UI):
             elif state in player.hazards:
                 color = 31
                 
-
             print(fmt.format(offset, color, shorthand), end="\x1B[m\x1B[u")
         print()
 
+    def display_message(self):
+        print("\x1B[6;35H\x1B[K\x1B[33m", self.errmsg, end="\x1B[m\x1B[999;H")
+        self.errmsg = ""
 
     def prompt_choice_card(self) -> int:
         card_range = set(map(str, range(Rule.FIRST_DEAL + 1)))

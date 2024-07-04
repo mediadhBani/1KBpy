@@ -22,18 +22,12 @@ class Game:
     def render_state(self):
         # effacer écran
         print("\x1B[2J\x1B[H", end="")
-
-        # panneau gauche
+        # affichage main joueur courant
         self.ui.display_hand(self.current_player)
-        
-        # panneau droite
-        for i, player in enumerate(self.players):
-            print(f"\x1B[{i+1};35H  {i}: ", end="")
-            self.ui.display_tableau(player)
-
-        print(f"\x1B[{self.players.index(self.current_player) + 1};35H>")
-        print("\x1B[6;35H\x1B[K\x1B[33m", self.ui.errmsg, end="\x1B[m\x1B[999;H")
-        self.ui.errmsg = ""
+        # affichage tableaux des joueurs
+        self.ui.display_tableaus(self.players, self.turn % self.number_players)
+        # affichage message évènement
+        self.ui.display_message()
 
 
     def is_over(self) -> bool:
