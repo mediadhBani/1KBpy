@@ -2,7 +2,6 @@ from abc import ABC, abstractmethod
 from sys import exit
 from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
-# from .mechanics import Game
 
 class UI(ABC):
     @abstractmethod
@@ -50,6 +49,7 @@ class CLI(UI):
             exit(0)
 
         return self.number_players
+
 
     def display_hand(self, player: Player):
         for i, card in enumerate(player.hand):
