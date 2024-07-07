@@ -51,6 +51,10 @@ class CLI(UI):
         return self.number_players
 
 
+    def refresh_display(self):
+        print("\x1B[2J\x1B[H", end="")
+
+
     def display_hand(self, player: Player):
         for i, card in enumerate(player.hand):
             print(f"{i}: {self.COLOR[type(card)]}{card}\x1B[m")

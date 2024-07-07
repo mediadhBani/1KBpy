@@ -20,8 +20,8 @@ class Game:
         self.current_player = self.players[0]
 
     def render_state(self):
-        # effacer écran
-        print("\x1B[2J\x1B[H", end="")
+        # rafraichir affichage
+        self.ui.refresh_display()
         # affichage main joueur courant
         self.ui.display_hand(self.current_player)
         # affichage tableaux des joueurs
