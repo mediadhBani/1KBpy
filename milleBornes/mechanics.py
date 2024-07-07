@@ -22,12 +22,16 @@ class Game:
     def render_state(self):
         # rafraichir affichage
         self.ui.refresh_display()
-        # affichage main joueur courant
+        # affichage main joueur courante
         self.ui.display_hand(self.current_player)
         # affichage tableaux des joueurs
         self.ui.display_tableaus(self.players, self.turn % self.number_players)
         # affichage message évènement
         self.ui.display_message()
+
+    def prompt_action(self) -> int:
+        self.card_idx = self.ui.prompt_choice_card()
+        return self.card_idx
 
 
     def is_over(self) -> bool:
