@@ -1,6 +1,6 @@
 from .cards import Card, CardShoe, State
 from .players import Player, Status
-from .rules import Rule
+from .rules import Rule, BadMove
 from .ui import CLI
 
 
@@ -48,7 +48,15 @@ class Game:
         return self.current_player
 
     def do_action(self):
-        ...
+        if self.card_idx >= 0:
+            if (card := self.current_player.hand[self.card_idx]).is_hazard():
+                target_idx = self.ui.prompt_choice_target(self.current_player, self.players)
+                if self.current_player is (target := self.players[target_idx]):
+                    raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
+            else:
+                target = self.current_player
+                
+            self.play(target, card)
 
     def play(self, player: Player, card: Card):
         player <<= card

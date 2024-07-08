@@ -24,21 +24,6 @@ if __name__ == "__main__":
             game.ui.errmsg = str(exc)
             continue
 
-        # si le joueur ne défausse pas
-        if card_idx >= 0:
-            try:
-                if (card := player.hand[card_idx]).is_hazard():
-                    target_idx = ui.prompt_choice_target(player, game.players)
-                    if player is (target := game.players[target_idx]):
-                        raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
-                else:
-                    target = player
-
-                game.play(target, card)
-            except BadMove as exc:
-                game.ui.errmsg = str(exc)
-                continue
-
         # la carte jouée est défaussée
         player.hand.pop(card_idx)
         game.turn_end = True
