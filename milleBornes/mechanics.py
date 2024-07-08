@@ -47,6 +47,9 @@ class Game:
 
         return self.current_player
 
+    def do_action(self):
+        ...
+
     def play(self, player: Player, card: Card):
         player <<= card
         

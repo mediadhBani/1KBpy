@@ -9,7 +9,7 @@ if __name__ == "__main__":
     ui = CLI()
     game = Game(ui.prompt_number_players())
 
-    while True:
+    while not game.is_over():
         player = game.pick_player()
         game.render_state()
         
@@ -18,9 +18,11 @@ if __name__ == "__main__":
         except (EOFError, SystemExit):
             break
 
-        # game.do_action()
-        # if game.is_over():
-        #     break
+        try:
+            game.do_action()
+        except BadMove as exc:
+            game.ui.errmsg = str(exc)
+            continue
 
         # si le joueur ne défausse pas
         if card_idx >= 0:
@@ -40,10 +42,6 @@ if __name__ == "__main__":
         # la carte jouée est défaussée
         player.hand.pop(card_idx)
         game.turn_end = True
-
-        # check end of game
-        if game.is_over():
-            break
 
     ui.display_game_end(game.players)
 
