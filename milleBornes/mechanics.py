@@ -58,6 +58,9 @@ class Game:
                 
             self.play(target, card)
 
+        self.current_player.hand.pop(self.card_idx)
+        self.turn_end = True
+
     def play(self, player: Player, card: Card):
         player <<= card
         
