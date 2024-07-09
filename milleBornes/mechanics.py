@@ -1,23 +1,14 @@
 from .cards import Card, CardShoe, State
 from .players import Player, Status
 from .rules import Rule, BadMove
-from .ui import CLI
 
 
 class Game:
-    def __init__(self, number_players: int):
-        self.number_players = number_players
+    def __init__(self, ui: type):
         self.deck = CardShoe()
         self.turn = -1
         self.turn_end = True
-        self.ui = CLI()
-        self.players = [
-            Player(name=f"J{i}",
-                   hazards=State.LIGHT,
-                   hand=self.deck.deal()
-            ) for i in range(self.number_players)
-        ]
-        self.current_player = self.players[0]
+        self.ui = ui()
 
     def render_state(self):
         # rafraichir affichage
@@ -33,11 +24,12 @@ class Game:
         self.card_idx = self.ui.prompt_choice_card()
         return self.card_idx
 
+    
 
     def is_over(self) -> bool:
         return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
 
-    def pick_player(self) -> Player:
+    def start_turn(self) -> Player:
         self.turn += self.turn_end
         self.current_player = self.players[self.turn % self.number_players]
 
@@ -73,5 +65,16 @@ class Game:
             self.turn = self.players.index(player) - 1
 
         player.status = Status.OK
-        self.turn_end = True
 
+    def prepare(self):
+        self.number_players = self.ui.prompt_number_players()
+
+        self.players = [
+            Player(
+                name=f"J{i}", hazards=State.LIGHT, hand=self.deck.deal()
+            ) for i in range(self.number_players)
+        ]
+        self.current_player = self.players[0]
+
+    def conclude(self):
+        self.ui.display_game_end(self.players)

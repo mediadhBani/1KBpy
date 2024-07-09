@@ -6,11 +6,11 @@ from milleBornes.rules import BadMove
 
 
 if __name__ == "__main__":
-    ui = CLI()
-    game = Game(ui.prompt_number_players())
+    game = Game(CLI)
+    game.prepare()
 
     while not game.is_over():
-        game.pick_player()
+        game.start_turn()
         game.render_state()
         
         try:
@@ -23,5 +23,5 @@ if __name__ == "__main__":
         except BadMove as exc:
             game.ui.errmsg = str(exc)
 
-    ui.display_game_end(game.players)
+    game.conclude()
 
