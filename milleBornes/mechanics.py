@@ -1,14 +1,15 @@
+from milleBornes.ui import UI
 from .cards import Card, CardShoe, State
 from .players import Player, Status
 from .rules import Rule, BadMove
 
 
 class Game:
-    def __init__(self, ui: type):
+    def __init__(self, ui: UI):
         self.deck = CardShoe()
         self.turn = -1
         self.turn_end = True
-        self.ui = ui()
+        self.ui = ui
 
     def render_state(self):
         # rafraichir affichage
@@ -25,7 +26,6 @@ class Game:
         return self.card_idx
 
     
-
     def is_over(self) -> bool:
         return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
 
@@ -78,3 +78,7 @@ class Game:
 
     def conclude(self):
         self.ui.display_game_end(self.players)
+
+    def pass_error(self, exc: Exception):
+        self.ui.alert = exc
+        

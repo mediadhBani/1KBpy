@@ -4,9 +4,49 @@ from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
 
 class UI(ABC):
-    @abstractmethod
     def __init__(self) -> None:
+        self.alert = Exception()
+
+    @abstractmethod
+    def prompt_number_players(self) -> int:
         pass
+
+    @abstractmethod
+    def refresh_display(self):
+        pass
+
+    @abstractmethod
+    def display_hand(self, player: Player):
+        pass
+
+    @abstractmethod
+    def display_tableaus(self, players: list[Player], idx_current_player: int):
+        pass
+
+    @abstractmethod
+    def display_message(self):
+        pass
+
+    @abstractmethod
+    def prompt_choice_card(self) -> int:
+        pass
+
+    @abstractmethod
+    def prompt_choice_target(self, attacker: Player, players: list[Player]) -> int:
+        pass
+
+    @abstractmethod
+    def display_game_end(self, players: list[Player]):
+        pass
+
+
+class CLI(UI):
+    COLOR: dict[type[Card], str] = {
+        Distance: "\x1B[39m",
+        Hazard: "\x1B[31m",
+        Remedy: "\x1B[34m",
+        Safety: "\x1B[32m",
+    }
 
     def input(self, prompt: str, options: set[str], help="") -> str:
         prompt = "\x1B[K" + prompt + "\x1B[s"
@@ -24,19 +64,6 @@ class UI(ABC):
                 prompt = help
                 continue
 
-
-class CLI(UI):
-    COLOR: dict[type[Card], str] = {
-        Distance: "\x1B[39m",
-        Hazard: "\x1B[31m",
-        Remedy: "\x1B[34m",
-        Safety: "\x1B[32m",
-    }
-
-    def __init__(self):
-        self.number_players: int = 0
-        self.errmsg: str = ""
-
     def prompt_number_players(self) -> int:
         ans = self.input(
             "Combien de joueurs ? ",
@@ -44,11 +71,10 @@ class CLI(UI):
             "0 pour quitter ou 2 à 4 pour jouer."
         )
         
-        self.number_players = int(ans)
-        if self.number_players == 0:
-            exit(0)
+        if (number_players := int(ans)) == 0:
+            raise EOFError
 
-        return self.number_players
+        return number_players
 
 
     def refresh_display(self):
@@ -105,8 +131,8 @@ class CLI(UI):
         print()
 
     def display_message(self):
-        print("\x1B[6;35H\x1B[K\x1B[33m", self.errmsg, end="\x1B[m\x1B[999;H")
-        self.errmsg = ""
+        print("\x1B[6;35H\x1B[K\x1B[33m", self.alert, end="\x1B[m\x1B[999;H")
+        self.alert = Exception()
 
     def prompt_choice_card(self) -> int:
         card_range = set(map(str, range(Rule.FIRST_DEAL + 1)))

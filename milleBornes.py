@@ -6,7 +6,7 @@ from milleBornes.rules import BadMove
 
 
 if __name__ == "__main__":
-    game = Game(CLI)
+    game = Game(CLI())
     game.prepare()
 
     while not game.is_over():
@@ -15,13 +15,11 @@ if __name__ == "__main__":
         
         try:
             game.prompt_action()
-        except (EOFError, SystemExit):
-            break
-
-        try:
             game.do_action()
         except BadMove as exc:
-            game.ui.errmsg = str(exc)
+            game.pass_error(exc)
+        except EOFError:
+            break
 
     game.conclude()
 
