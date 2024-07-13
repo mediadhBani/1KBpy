@@ -11,3 +11,6 @@ class Rule(IntEnum):
 class BadMove(ValueError):
     pass
 
+class BadParse(ValueError):
+    pass
+

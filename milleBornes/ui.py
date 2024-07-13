@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 from sys import exit
+
+from milleBornes.rules import BadParse
 from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
 
@@ -47,6 +49,19 @@ class CLI(UI):
         Remedy: "\x1B[34m",
         Safety: "\x1B[32m",
     }
+
+    def prompt_action(self, prompt="") -> tuple[None | int, None | int]:
+        cmd = input(prompt + "> ")
+        
+        match list(cmd):
+            case ["0" | "1" | "2" | "3" | "4" | "5" | "6" as card]: return int(card), None
+            case [
+                "0" | "1" | "2" | "3" | "4" | "5" | "6" as card,
+                "0" | "1" | "2" | "3" | "-" as target
+            ]:
+                return int(card), -1 if target == "-" else int(target)
+            case _:
+                raise BadParse("Saisir l'indice de la carte à jouer puis celle de la cible.")
 
     def input(self, prompt: str, options: set[str], help="") -> str:
         prompt = "\x1B[K" + prompt + "\x1B[s"
