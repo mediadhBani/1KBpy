@@ -22,7 +22,7 @@ class Game:
         self.ui.display_message()
 
     def prompt_action(self) -> int:
-        self.card_idx = self.ui.prompt_choice_card()
+        self.card_idx, self.target_idx = self.ui.prompt_action()
         return self.card_idx
 
     
@@ -40,15 +40,17 @@ class Game:
         return self.current_player
 
     def do_action(self):
-        if self.card_idx >= 0:
-            if (card := self.current_player.hand[self.card_idx]).is_hazard():
-                target_idx = self.ui.prompt_choice_target(self.current_player, self.players)
-                if self.current_player is (target := self.players[target_idx]):
-                    raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
-            else:
-                target = self.current_player
-                
+        if self.target_idx != -1:
+            if self.target_idx is None:
+                self.target_idx = self.turn % self.number_players
+            if not (
+                (card := self.current_player.hand[self.card_idx]).is_hazard() ^ 
+                ((target := self.players[self.target_idx]) is self.current_player)
+            ):
+                raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
+
             self.play(target, card)
+
 
         self.current_player.hand.pop(self.card_idx)
         self.turn_end = True

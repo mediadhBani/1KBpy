@@ -2,7 +2,7 @@
 
 from milleBornes.mechanics import Game
 from milleBornes.ui import CLI
-from milleBornes.rules import BadMove
+from milleBornes.rules import BadMove, BadParse
 
 
 if __name__ == "__main__":
@@ -16,7 +16,7 @@ if __name__ == "__main__":
         try:
             game.prompt_action()
             game.do_action()
-        except BadMove as exc:
+        except (BadMove, BadParse) as exc:
             game.pass_error(exc)
         except EOFError:
             break

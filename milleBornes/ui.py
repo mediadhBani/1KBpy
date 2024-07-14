@@ -1,9 +1,12 @@
 from abc import ABC, abstractmethod
 from sys import exit
+from typing import Optional
 
 from milleBornes.rules import BadParse
 from .players import Player
 from .cards import Card, Distance, Hazard, Remedy, Rule, Safety, State
+
+type Action = tuple[int, Optional[int]]
 
 class UI(ABC):
     def __init__(self) -> None:
@@ -41,6 +44,10 @@ class UI(ABC):
     def display_game_end(self, players: list[Player]):
         pass
 
+    @abstractmethod
+    def prompt_action(self) -> Action:
+        pass
+
 
 class CLI(UI):
     COLOR: dict[type[Card], str] = {
@@ -50,7 +57,7 @@ class CLI(UI):
         Safety: "\x1B[32m",
     }
 
-    def prompt_action(self, prompt="") -> tuple[None | int, None | int]:
+    def prompt_action(self, prompt="") -> Action:
         cmd = input(prompt + "> ")
         
         match list(cmd):
