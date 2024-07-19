@@ -17,7 +17,7 @@ class Game:
         # affichage main joueur courante
         self.ui.display_hand(self.current_player)
         # affichage tableaux des joueurs
-        self.ui.display_tableaus(self.players, self.turn % self.number_players)
+        self.ui.display_tableaus(self.players, self.turn)
         # affichage message évènement
         self.ui.display_message()
 
@@ -30,8 +30,8 @@ class Game:
         return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
 
     def start_turn(self) -> Player:
-        self.turn += self.turn_end
-        self.current_player = self.players[self.turn % self.number_players]
+        self.turn = (self.turn + self.turn_end) % self.number_players
+        self.current_player = self.players[self.turn]
 
         if self.turn_end:
             self.current_player.hand.append(self.deck.draw())
@@ -42,7 +42,7 @@ class Game:
     def do_action(self):
         if self.target_idx != -1:
             if self.target_idx is None:
-                self.target_idx = self.turn % self.number_players
+                self.target_idx = self.turn
             if not (
                 (card := self.current_player.hand[self.card_idx]).is_hazard() ^ 
                 ((target := self.players[self.target_idx]) is self.current_player)
