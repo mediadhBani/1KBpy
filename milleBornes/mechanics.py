@@ -55,7 +55,8 @@ class Game:
 
     def do_action(self):
         if self.target_idx != -1:
-            card, target = self.current_player.hand[self.card_idx], self.players[self.target_idx]
+            card = self.current_player.hand[self.card_idx]
+            target = self.players[self.target_idx]
             self.play(target, card)
 
         self.current_player.hand.pop(self.card_idx)
@@ -65,10 +66,10 @@ class Game:
         player <<= card
         
         if player.status is Status.SAFETY:
-            print("__Rejouez.__")
+            self.ui.alert = Exception("Rejouez !")
             self.turn -= 1
         elif player.status is Status.COUNTER_TRHUST:
-            print("__Coup fourré !__")
+            self.ui.alert = Exception("Coup fourré !")
             player.hand.append(self.deck.draw())
             self.turn = self.players.index(player) - 1
 
