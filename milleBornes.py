@@ -9,7 +9,7 @@ if __name__ == "__main__":
     game = Game(CLI())
     game.prepare()
 
-    while not game.is_over():
+    while True:
         game.start_turn()
         game.render_state()
         
@@ -19,6 +19,9 @@ if __name__ == "__main__":
         except (BadMove, BadParse) as exc:
             game.pass_error(exc)
         except EOFError:
+            break
+        
+        if game.is_over():
             break
 
     game.conclude()

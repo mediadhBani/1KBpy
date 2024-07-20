@@ -38,7 +38,7 @@ class Game:
             raise BadMove("Vous ne pouvez pas aider vos adversaires.")
 
         if self.target_idx is None:
-            self.target_idx = ~self.turn if card.is_hazard() else self.turn
+            self.target_idx = self.number_players - self.turn - 1 if card.is_hazard() else self.turn
 
 
     def is_over(self) -> bool:
@@ -83,6 +83,7 @@ class Game:
             ) for i in range(self.number_players)
         ]
         self.current_player = self.players[0]
+
 
     def conclude(self):
         self.ui.display_game_end(self.players)
