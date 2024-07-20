@@ -21,15 +21,30 @@ class Game:
         # affichage message évènement
         self.ui.display_message()
 
-    def prompt_action(self) -> int:
+    def prompt_action(self):
         self.card_idx, self.target_idx = self.ui.prompt_action()
-        return self.card_idx
+        card = self.current_player.hand[self.card_idx]
 
-    
+        if self.target_idx is not None and self.target_idx >= self.number_players:
+            raise BadMove(f"Il n'y a que {self.number_players} joueurs ou joueuses à viser.")
+
+        if card.is_hazard() and self.target_idx == self.turn:
+            raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
+
+        if card.is_hazard() and self.target_idx is None and self.number_players > 2:
+            raise BadMove("Veuillez préciser l'adversaire à attaquer.")
+
+        if not card.is_hazard() and self.target_idx not in {-1, None, self.turn}:
+            raise BadMove("Vous ne pouvez pas aider vos adversaires.")
+
+        if self.target_idx is None:
+            self.target_idx = ~self.turn if card.is_hazard() else self.turn
+
+
     def is_over(self) -> bool:
         return self.current_player.score == Rule.WINNING_DISTANCE or not self.deck.has_distances()
 
-    def start_turn(self) -> Player:
+    def start_turn(self):
         self.turn = (self.turn + self.turn_end) % self.number_players
         self.current_player = self.players[self.turn]
 
@@ -37,20 +52,11 @@ class Game:
             self.current_player.hand.append(self.deck.draw())
             self.turn_end = False
 
-        return self.current_player
 
     def do_action(self):
         if self.target_idx != -1:
-            if self.target_idx is None:
-                self.target_idx = self.turn
-            if not (
-                (card := self.current_player.hand[self.card_idx]).is_hazard() ^ 
-                ((target := self.players[self.target_idx]) is self.current_player)
-            ):
-                raise BadMove("Vous ne pouvez pas vous attaquer à vous même.")
-
+            card, target = self.current_player.hand[self.card_idx], self.players[self.target_idx]
             self.play(target, card)
-
 
         self.current_player.hand.pop(self.card_idx)
         self.turn_end = True
