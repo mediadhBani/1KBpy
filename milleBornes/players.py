@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import IntEnum
 
 from .cards import *
-from .rules import BadMove, Rule
+from .rules import BadMove, Rule, SafetyUse, CounterThrust
 
 class Status(IntEnum):
     OK = 0
@@ -30,9 +30,10 @@ class Player:
         return self
 
     def take_safety(self, state: State):
-        self.status = Status.SAFETY
         self.hazards &= ~state
         self.safeties |= state
+
+        raise SafetyUse("Rejouez !")
 
     def take_remedy(self, state: State):
         if self.hazards is State(0):
@@ -55,11 +56,10 @@ class Player:
 
         for i, card in enumerate(self.hand):
             if type(card) is Safety and hazard in (safety := card.value):
-                self.status = Status.COUNTER_TRHUST
                 self.hand.pop(i)
                 self.hazards &= ~safety
                 self.safeties |= safety
-                break
+                raise CounterThrust("Coup fourré !")
         else:
             self.hazards |= hazard
 

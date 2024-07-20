@@ -1,7 +1,7 @@
 from milleBornes.ui import UI
 from .cards import Card, CardShoe, State
 from .players import Player, Status
-from .rules import Rule, BadMove
+from .rules import Rule, BadMove, SafetyUse, CounterThrust
 
 
 class Game:
@@ -63,17 +63,16 @@ class Game:
         self.turn_end = True
 
     def play(self, player: Player, card: Card):
-        player <<= card
-        
-        if player.status is Status.SAFETY:
-            self.ui.alert = Exception("Rejouez !")
+        try:
+            player <<= card
+        except SafetyUse as exc:
+            self.ui.alert = exc
             self.turn -= 1
-        elif player.status is Status.COUNTER_TRHUST:
-            self.ui.alert = Exception("Coup fourré !")
+        except CounterThrust as exc:
+            self.ui.alert = exc
             player.hand.append(self.deck.draw())
             self.turn = self.players.index(player) - 1
-
-        player.status = Status.OK
+            
 
     def prepare(self):
         self.number_players = self.ui.prompt_number_players()
