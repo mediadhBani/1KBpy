@@ -1,6 +1,6 @@
 from milleBornes.ui import UI
 from .cards import Card, CardShoe, State
-from .players import Player, Status
+from .players import Player
 from .rules import Rule, BadMove, SafetyUse, CounterThrust
 
 

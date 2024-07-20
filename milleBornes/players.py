@@ -1,13 +1,7 @@
 from dataclasses import dataclass, field
-from enum import IntEnum
 
 from .cards import *
 from .rules import BadMove, Rule, SafetyUse, CounterThrust
-
-class Status(IntEnum):
-    OK = 0
-    SAFETY = 1
-    COUNTER_TRHUST = 2
 
 
 @dataclass
@@ -17,7 +11,6 @@ class Player:
     count200: int = 0
     hazards: State = State.LIGHT
     safeties: State = State(0)
-    status: Status = Status.OK
     hand: list[Card] = field(default_factory=list)
 
     def __ilshift__(self, other: Card) -> Self:
