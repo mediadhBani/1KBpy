@@ -13,14 +13,12 @@ class Player:
     safeties: State = State(0)
     hand: list[Card] = field(default_factory=list)
 
-    def __ilshift__(self, other: Card) -> Self:
+    def take(self, other: Card):
         match other:
             case Distance(d): self.run(d)
             case Hazard(s): self.take_hazard(s)
             case Remedy(s): self.take_remedy(s)
             case Safety(s): self.take_safety(s)
-
-        return self
 
     def take_safety(self, state: State):
         self.hazards &= ~state

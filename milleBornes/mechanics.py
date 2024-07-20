@@ -64,7 +64,7 @@ class Game:
 
     def play(self, player: Player, card: Card):
         try:
-            player <<= card
+            player.take(card)
         except SafetyUse as exc:
             self.ui.alert = exc
             self.turn -= 1
