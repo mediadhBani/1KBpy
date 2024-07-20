@@ -1,4 +1,5 @@
 from dataclasses import dataclass, field
+from typing import Callable
 
 from .cards import *
 from .rules import BadMove, Rule, SafetyUse, CounterThrust
@@ -12,9 +13,10 @@ class Player:
     hazards: State = State.LIGHT
     safeties: State = State(0)
     hand: list[Card] = field(default_factory=list)
+    action_callback: Callable = lambda x: x
 
-    def take(self, other: Card):
-        match other:
+    def take(self, card: Card):
+        match card:
             case Distance(d): self.run(d)
             case Hazard(s): self.take_hazard(s)
             case Remedy(s): self.take_remedy(s)
