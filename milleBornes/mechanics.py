@@ -1,7 +1,7 @@
 from milleBornes.ui import UI
 from .cards import Card, CardShoe, State
 from .players import Player
-from .rules import Rule, BadMove, SafetyUse, CounterThrust
+from .rules import *
 
 
 class Game:
@@ -10,6 +10,26 @@ class Game:
         self.turn = -1
         self.turn_end = True
         self.ui = ui
+
+    def run(self):
+        self.prepare()
+        
+        while True:
+            self.start_turn()
+            self.render_state()
+
+            try:
+                self.prompt_action()
+                self.do_action()
+            except (BadMove, BadParse) as exc:
+                self.ui.alert = exc
+            except EOFError:
+                break
+            
+            if self.is_over():
+                break
+
+        self.conclude()
 
     def render_state(self):
         # rafraichir affichage
